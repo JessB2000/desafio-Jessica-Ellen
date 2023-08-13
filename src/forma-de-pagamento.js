@@ -8,6 +8,6 @@ class MetodoDePagamento{
     retornarFormaPagamento(){
         return this.pagamentos; 
     }
-
 }
-export {MetodoDePagamento}; 
+
+export {MetodoDePagamento};

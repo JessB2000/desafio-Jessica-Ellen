@@ -3,48 +3,59 @@ import { MetodoDePagamento } from "./forma-de-pagamento";
 
 class CaixaDaLanchonete {
     constructor() {
-        this.itensCardapio = [];
-        this.formaPagamento = [];
+        this.inserirFormadePagamento();
+        this.inserirItensCardapio();
     }
 
-    colocarItemCardapio(item) {
-        this.itensCardapio.push(item);
+    inserirFormadePagamento() {
+        this.metodosDePagamento = new MetodoDePagamento();
+        this.metodosDePagamento.adicionarFormaDePagamento('dinheiro');
+        this.metodosDePagamento.adicionarFormaDePagamento('credito');
+        this.metodosDePagamento.adicionarFormaDePagamento('debito');
     }
 
-    colocarFormaPagamento(forma) {
-        this.formaPagamento.push(forma);
+    inserirItensCardapio() {
+        this.cardapio = new Cardapio();
+        this.cardapio.inserirItemCardapio('cafe', 'Café', '3.00');
+        this.cardapio.inserirItemCardapio('chantily', 'Chantily (extra do Café)', '1.50');
+        this.cardapio.inserirItemCardapio('suco', 'Suco Natural', '6.20');
+        this.cardapio.inserirItemCardapio('sanduiche', 'Sanduíche', '6.50');
+        this.cardapio.inserirItemCardapio('queijo', 'Queijo (extra do Sanduíche)', '2.00');
+        this.cardapio.inserirItemCardapio('salgado', 'Salgado', '7.25');
+        this.cardapio.inserirItemCardapio('combo1', '1 Suco e 1 Sanduíche', '9.50');
+        this.cardapio.inserirItemCardapio('combo2', '1 Café e 1 Sanduíche', '7.50');
     }
 
-    calcularValorDaCompra(metodoDePagamento, itens) {
-        const cardapio = new Cardapio();
-        const metodosDePagamento = new MetodoDePagamento();
-        if (!this.formaPagamento.some(forma => forma === metodoDePagamento)){
+    calcularValorDaCompra(formaDePagamento, itens) {
+        if (!this.metodosDePagamento.pagamentos.includes(formaDePagamento)) {
             return "Forma de pagamento inválida!";
         }
         if (itens.length === 0) {
-            return "Não há itens no carrinho de compra"; 
+            return "Não há itens no carrinho de compra!";
         }
 
-        let total = 0; 
+        let total = 0;
 
-        for (const item of itens){
-            const [codigo, quantidade] = item.split(','); 
+        for (const item of itens) {
+            const [codigo, quantidade] = item.split(',');
 
-            const itemCardapio = this.itensCardapio.find(item => item.codigo === codigo); 
+            const itemCardapio = this.cardapio.itens.find(itemCardapio => itemCardapio.codigo === codigo);
 
-            if (!itemCardapio){
+            if (!itemCardapio) {
                 return "Item inválido!";
             }
 
-            total += itemCardapio.valor * parseInt(quantidade, 10); 
+            total += parseFloat(itemCardapio.valor) * parseInt(quantidade, 10);
         }
-        if (metodoDePagamento === "dinheiro"){
-            total *= 0.95; 
+
+        if (formaDePagamento === "dinheiro") {
+            total *= 0.95;
+        } else if (formaDePagamento === "credito") {
+            total *= 1.03;
         }
-        else if (metodoDePagamento === "credito"){
-            total *= 1.03; 
-        }
-        return `Total da compra (${metodoDePagamento}): R$ ${total.toFixed(2)}`;
+
+        const totalBR = total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        return totalBR;
     }
 }
 
